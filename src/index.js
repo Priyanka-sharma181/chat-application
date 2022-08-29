@@ -11,16 +11,21 @@ app.use(express.static(publicDirectoryPath))
 
 io.on('connection', (socket) => {
     console.log('new websocate create');
-    socket.emit("msg","welcome!")
+    socket.emit("message","welcome!")
 
-    socket.broadcast.emit('message','A user has joined')
+socket.broadcast.emit('message','A user has joined')
     socket.on('sendMessage',(message)=>{
         io.emit('message',message)
     })
-    socket.on('disconnect',()=>{
-        io.emit
+    socket.on("sendLocation",(coords)=>{
+        io.emit('message',`https://google.com/maps?q=${coords.latitude},${coords.longitude}`)
+    })
+    socket.on('disconnect',()=>{ 
+        io.emit('message','A user has left')
     })
  });
+
+
 server.listen(3000,()=>{
     console.log("server is listining");
 })
