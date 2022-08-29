@@ -1,5 +1,6 @@
 const path = require("path")
 const http = require("http")
+const Filter = require("bad-words")
 const socketio = require("socket.io")
 const express = require("express")
 const app =  express()
@@ -14,11 +15,17 @@ io.on('connection', (socket) => {
     socket.emit("message","welcome!")
 
 socket.broadcast.emit('message','A user has joined')
-    socket.on('sendMessage',(message)=>{
+    socket.on('sendMessage',(message,callback)=>{
+        const filter = new Filter()
+        if(filter.isProfane(message)){
+            return callback("profinity is not allowed")
+        }
         io.emit('message',message)
+        callback("Deleverd !")
     })
-    socket.on("sendLocation",(coords)=>{
+    socket.on("sendLocation",(coords,callback)=>{
         io.emit('message',`https://google.com/maps?q=${coords.latitude},${coords.longitude}`)
+       callback()
     })
     socket.on('disconnect',()=>{ 
         io.emit('message','A user has left')
