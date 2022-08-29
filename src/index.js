@@ -8,15 +8,18 @@ const io = socketio(server)
 const publicDirectoryPath = path.join(__dirname,'../public')
 app.use(express.static(publicDirectoryPath))
 
-let count = 0
+
 io.on('connection', (socket) => {
     console.log('new websocate create');
-    socket.emit("countupdated",count) 
-    socket.on('increment',()=>{
-        count ++
-        io.emit('countupdated',count)
+    socket.emit("msg","welcome!")
+
+    socket.broadcast.emit('message','A user has joined')
+    socket.on('sendMessage',(message)=>{
+        io.emit('message',message)
     })
-    
+    socket.on('disconnect',()=>{
+        io.emit
+    })
  });
 server.listen(3000,()=>{
     console.log("server is listining");
