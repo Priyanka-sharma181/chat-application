@@ -1,4 +1,3 @@
-
 const socket = io()
 // Element
 
@@ -6,24 +5,49 @@ const $messageForm = document.querySelector("#message-form")
 const $messageFormInput = $messageForm.querySelector('input')
 const $messageFormButton = $messageForm.querySelector('button')
 const $sendLocationButton = document.querySelector("#send-location")
-const $message = document.querySelector("#message")
+const $message = document.querySelector("#messages")
+const $sidebarTemplate = document.querySelector("#sidebar-template").innerHTML
 // for randering msg 
 const $messageTemplate = document.querySelector("#message-template").innerHTML
 const $messageSendLocation = document.querySelector("#location-template").innerHTML
+// option 
+const {username,room}=Qs.parse(location.search,{ignoreQueryPrefix:true})
 
+
+
+
+
+
+
+// event for msg 
 socket.on("message",(message)=>{
     const html = Mustache.render($messageTemplate,{
-        message
+        username:message.username,
+        message :message.text,
+        createdAt:moment(message.createdAt).format("h:mm a")
     })
     $message.insertAdjacentHTML('beforeend',html)
 })
-// response location msg
-socket.on('sendLocation',(url)=>{
+// event for location 
+socket.on('sendLocation',(message)=>{
     const html = Mustache.render($messageSendLocation,{
-        url
+        username:message.username,
+        url:message.url,
+        createdAt:moment(message.createdAt).format("h:mm a")
+
     })
+    console.log(message);
     $message.insertAdjacentHTML('beforeend',html)
 })
+
+socket.on('roomData', ({ room, users }) => {
+    const html = Mustache.render($sidebarTemplate, {
+        room,
+        users
+    })
+    document.querySelector('#sidebar').innerHTML = html
+})
+
 
 $messageForm.addEventListener('submit',(e)=>{
     e.preventDefault()
@@ -59,4 +83,11 @@ $sendLocationButton.addEventListener('click',()=>{
             console.log("location shared");
         })
     })
+})
+
+socket.emit('join', { username, room }, (error) => {
+    if (error) {
+        alert(error)
+        location.href = '/'
+    }
 })
