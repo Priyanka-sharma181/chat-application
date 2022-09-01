@@ -15,10 +15,11 @@ const publicDirectoryPath = path.join(__dirname,'../public')
 app.use(express.static(publicDirectoryPath))
 
 
-
+//  io.on handle all connection, disconnection (events)
 io.on('connection', (socket) => {
     console.log('new websocate create');
 
+    // socket.on listen events
     socket.on('join', (options, callback) => {
         const { error, user } = addUser({ id: socket.id, ...options })
         if (error) {
@@ -48,10 +49,11 @@ io.on('connection', (socket) => {
         io.to(user.room).emit('message', generateMessage(user.username, message))
         callback()
     })
+    // it will response the sendLocation event 
     socket.on('sendLocation', (coords, callback) => {
         console.log(coords);
         const user = getUser(socket.id)
-        io.to(user.room).emit('sendLocation', generateMessage(user.username, `https://google.com/maps?q=${coords.latitude},${coords.longitude}`))
+        io.to(user.room).emit('sendLocation', generateLocationMessage(user.username, `https://google.com/maps?q=${coords.latitude},${coords.longitude}`))
         callback()
     })
 

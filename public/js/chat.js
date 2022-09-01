@@ -15,10 +15,6 @@ const {username,room}=Qs.parse(location.search,{ignoreQueryPrefix:true})
 
 
 
-
-
-
-
 // event for msg 
 socket.on("message",(message)=>{
     const html = Mustache.render($messageTemplate,{
